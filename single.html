@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="logo.jpeg" type="image/jpeg">
+<link rel="apple-touch-icon" href="logo.jpeg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LM Multimedia</title>
+<style>
+:root{
+  --bg:#faf6f1; --card:#ffffff; --text:#1c1714; --muted:#85786d; --line:#ece3d9;
+  --accent:#e8590c; --accent-hover:#cf4d08; --on-accent:#ffffff; --soft:#fdeee2; --soft-hover:#fbdcc6;
+}
+[data-theme="dark"]{
+  --bg:#0e0c0b; --card:#181514; --text:#f1ebe6; --muted:#9a8f87; --line:#2a2522;
+  --accent:#f26a1b; --accent-hover:#ff8240; --on-accent:#1a0b02; --soft:#261c16; --soft-hover:#33251c;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;transition:background .25s,color .25s}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.app{width:100%;max-width:520px;margin:0 auto;padding:12px 14px 28px;flex:1}
+button,a{transition:background .2s,color .2s,border-color .2s}
+
+/* header */
+.header{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px}
+.brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-decoration:none;color:inherit}
+.logo{width:42px;height:42px;border-radius:50%;overflow:hidden;position:relative;flex-shrink:0;background:#000}
+.logo img{position:absolute;width:58px;height:58px;max-width:none;left:-10.5px;top:-7.5px}
+.bt{display:flex;flex-direction:column;justify-content:center;min-width:0}
+.bt b{font-size:1.3rem;font-weight:800;letter-spacing:-.3px;line-height:1;color:var(--accent)}
+.bt small{font-size:.74rem;font-weight:700;line-height:1.2;color:var(--text);letter-spacing:.2px;margin-top:2px}
+.hbtn{height:38px;border-radius:10px;background:var(--soft);display:flex;align-items:center;justify-content:center;gap:6px;padding:0 12px;font-size:.85rem;font-weight:600;color:var(--accent);text-decoration:none}
+.hbtn.icon{width:38px;padding:0}
+.sun{display:none}[data-theme="dark"] .sun{display:block}[data-theme="dark"] .moon{display:none}
+
+/* media box */
+.media{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:10px}
+.stage{position:relative;width:100%;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:var(--soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.stage.video{background:#000;border-color:#000;aspect-ratio:16/9}
+.stage img{width:100%;height:100%;object-fit:cover}
+.stage video{width:100%;height:100%;display:block;background:#000}
+.stage .ph svg{width:64px;height:64px}
+.stage .ph,.stage img{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.player{display:flex;align-items:center;gap:12px;margin-top:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:14px}
+.pbtn{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.seek{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.times{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted)}
+input[type=range]{width:100%;height:4px;accent-color:var(--accent);cursor:pointer}
+.ttl{margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:700;font-size:1.02rem;line-height:1.3}
+
+/* info cards */
+.block{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.block h2{font-size:.72rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.block p{font-size:.92rem;line-height:1.6}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;font-size:.9rem}
+.row+.row{border-top:1px solid var(--line)}
+.row:first-of-type{padding-top:0}.row:last-child{padding-bottom:0}
+.row span{color:var(--muted)}
+.row b{font-weight:600;text-align:right}
+.row b a{color:var(--accent);text-decoration:none;font-weight:600}
+@media (hover:hover){.row b a:hover{text-decoration:underline}}
+
+/* actions */
+.actions{display:flex;gap:10px;margin-top:14px}
+.dlbtn{flex:1;height:52px;border-radius:14px;background:linear-gradient(to right,var(--accent-hover) var(--p,0%),var(--accent) var(--p,0%));color:var(--on-accent);font-weight:700;font-size:.95rem;display:flex;align-items:center;justify-content:center;gap:8px}
+.sharebtn{width:52px;height:52px;border-radius:14px;background:var(--soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.count{text-align:center;font-size:.8rem;color:var(--muted);margin-top:12px}
+.count b{color:var(--text)}
+.nf{text-align:center;padding:70px 10px;color:var(--muted)}
+.nf a{display:inline-block;margin-top:14px;color:var(--accent);font-weight:700;text-decoration:none}
+
+/* footer, toast */
+footer{background:#000;color:#b9aea6;text-align:center;font-size:.78rem;padding:22px 12px 26px;border-top:2px solid var(--accent)}
+footer p+p{margin-top:8px}
+footer a{color:#f1ebe6;text-decoration:none;font-weight:600;border-bottom:1px solid #5a4a40;padding-bottom:1px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:11px 16px;border-radius:12px;font-size:.85rem;max-width:90%;text-align:center;opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (hover:hover){
+  .hbtn:hover,.sharebtn:hover{background:var(--accent);color:var(--on-accent)}
+  .pbtn:hover,.dlbtn:hover{background:var(--accent-hover)}
+  footer a:hover{color:var(--accent);border-color:var(--accent)}
+}
+
+@media (min-width:768px){
+  body::before{
+    --pattern:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360' viewBox='0 0 360 360'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(30 30) rotate(-15 12 12) scale(1.6)'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/g%3E%3Cg transform='translate(220 40) rotate(12 12 12) scale(1.6)'%3E%3Cpath d='M3 18v-6a9 9 0 0 1 18 0v6'/%3E%3Cpath d='M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z'/%3E%3C/g%3E%3Cg transform='translate(125 135) rotate(-8 12 12) scale(1.6)'%3E%3Crect x='9' y='2' width='6' height='12' rx='3'/%3E%3Cpath d='M19 10v1a7 7 0 0 1-14 0v-1M12 18v4'/%3E%3C/g%3E%3Cg transform='translate(285 185) rotate(10 12 12) scale(1.5)'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/g%3E%3Cg transform='translate(35 235) rotate(-12 12 12) scale(1.5)'%3E%3Cpath d='M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21.2l7.7-7.7 1.1-1.1a5.5 5.5 0 0 0 0-7.8z'/%3E%3C/g%3E%3Cg transform='translate(170 285) rotate(8 12 12) scale(1.5)'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M10 8l6 4-6 4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:var(--accent);opacity:.06;
+    -webkit-mask:var(--pattern);mask:var(--pattern);
+  }
+}
+/* fixed header */
+.header{position:fixed;top:12px;left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:492px;z-index:40;padding:12px 10px;box-shadow:0 -12px 0 var(--bg);transition:background .25s,border-color .25s,box-shadow .25s}
+.logo{width:46px;height:46px}
+.logo img{width:63.5px;height:63.5px;left:-11.5px;top:-8.2px}
+.app{padding-top:84px}
+
+/* loading spinner */
+.spin{width:18px;height:18px;border:2.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+.pbtn .spin{width:20px;height:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* more space under the play slider */
+.seek{gap:12px}
+
+/* centered section titles */
+.block h2{text-align:center}
+/* mobile equalizer background */
+.eq{display:none}
+@media (max-width:767px){
+  .eq{position:fixed;left:0;right:0;bottom:0;height:110px;display:flex;align-items:flex-end;gap:6px;padding:0 12px;z-index:-1;pointer-events:none;opacity:.1}
+  .eq i{flex:1;height:100%;background:var(--accent);border-radius:3px 3px 0 0;transform-origin:bottom;transform:scaleY(.15);animation:eq 1.6s ease-in-out infinite}
+}
+@keyframes eq{0%,100%{transform:scaleY(.12)}50%{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.eq i{animation:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <a class="hbtn icon" href="index.html" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M19 12H5m6-6-6 6 6 6"/></svg></a>
+    <a class="brand" href="index.html">
+      <span class="logo"><img src="logo.jpeg" alt="LM Multimedia" onerror="this.style.visibility='hidden'"></span>
+      <span class="bt"><b>LM</b><small>Multimedia</small></span>
+    </a>
+    <button class="hbtn icon" id="themeBtn" aria-label="Toggle theme">
+      <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </header>
+
+  <div id="page"></div>
+</div>
+
+<footer>
+  <p>&copy; <span id="year"></span> LM Multimedia. All rights reserved.</p>
+  <p><a href="legal.html">Copyright &amp; Legal</a></p>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========= BACKEND CONFIG ========= */
+const API = "http://localhost:5001";
+const abs = u => !u ? "" : /^(https?:|data:|blob:)/i.test(u) ? u : API + (u.startsWith("/") ? "" : "/") + u;
+
+/* ========= HELPERS ========= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = s => isFinite(s) && s > 0 ? Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0") : "0:00";
+const bytes = n => n > 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
+const I = {
+  play: '<svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z" fill="currentColor"/></svg>',
+  pause: '<svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg>',
+  dl: '<svg viewBox="0 0 24 24"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 20h16"/></svg>',
+  share: '<svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>',
+  note: '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'
+};
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+/* theme (shared with index.html) */
+const root = document.documentElement;
+root.dataset.theme = localStorage.getItem("theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+$("#themeBtn").addEventListener("click", () => {
+  root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
+  localStorage.setItem("theme", root.dataset.theme);
+});
+$("#year").textContent = new Date().getFullYear();
+
+/* ========= PAGE ========= */
+const params = new URLSearchParams(location.search);
+const id = params.get("id");
+const typeParam = params.get("type");
+const page = $("#page");
+
+const notFound = msg => { page.innerHTML = `<div class="nf">${msg}<br><a href="index.html">Back to all media</a></div>`; };
+
+async function fetchItem() {
+  const types = typeParam === "audio" || typeParam === "video" ? [typeParam] : ["audio", "video"];
+  let failed = false;
+  for (const t of types) {
+    try {
+      const res = await fetch(API + "/api/" + t + "/" + encodeURIComponent(id));
+      if (res.ok) { const json = await res.json(); return { data: json.data, type: t }; }
+      if (res.status !== 404) failed = true;
+    } catch { failed = true; }
+  }
+  return { error: failed };
+}
+
+(async function init() {
+  if (!id) { notFound("This item could not be found."); return; }
+  page.innerHTML = '<div class="nf">Loading…</div>';
+  const r = await fetchItem();
+  if (!r.data) { notFound(r.error ? "Could not load this item. Please try again." : "This item could not be found."); return; }
+  build(r.data, r.type);
+})();
+
+function build(d, type) {
+  const item = {
+        id: d._id, shareId: d.shareId || "", type, title: d.title || "", long: d.description || "No description provided.",
+    artist: d.artist || "LM Multimedia", socialLink: d.socialLink || "",
+    src: abs(d.fileUrl), thumb: abs(d.thumbnailUrl), date: d.createdAt,
+    downloads: d.downloads || 0, duration: d.duration || 0, fileSize: d.fileSize || 0,
+    format: d.format || (abs(d.fileUrl).split("?")[0].split(".").pop() || "").toUpperCase()
+  };
+  const isAudio = item.type === "audio";
+  const ext = item.format || "—";
+  const dlUrl = API + "/api/" + item.type + "/" + encodeURIComponent(item.id) + "/download";
+  document.title = item.title + " | LM Multimedia";
+
+  const stage = isAudio
+    ? `<div class="stage">${item.thumb ? `<img src="${esc(item.thumb)}" alt="">` : `<div class="ph">${I.note}</div>`}</div>
+       <div class="player">
+         <button class="pbtn" id="pbtn" aria-label="Play">${I.play}</button>
+         <div class="seek"><input type="range" id="seek" min="0" max="100" step="0.1" value="0" aria-label="Seek">
+           <div class="times"><span id="cur">0:00</span><span id="dur">${fmt(item.duration)}</span></div></div>
+       </div>`
+    : `<div class="stage video"><video id="vid" controls playsinline preload="metadata" ${item.thumb ? `poster="${esc(item.thumb)}"` : ""} src="${esc(item.src)}"></video></div>`;
+
+  page.innerHTML = `
+    <section class="media">
+      ${stage}
+      <div class="ttl">${esc(item.title)}</div>
+    </section>
+
+    <section class="block"><h2>Description</h2><p>${esc(item.long)}</p></section>
+
+    <section class="block"><h2>Other details</h2>
+      <div class="row"><span>Type</span><b>${isAudio ? "Audio" : "Video"}</b></div>
+      <div class="row"><span>Format</span><b>${esc(ext)}</b></div>
+        <div class="row"><span>Artist</span><b>${esc(item.artist)}</b></div>
+      ${item.socialLink ? `<div class="row"><span>Social media</span><b><a href="${esc(item.socialLink)}" target="_blank" rel="noopener">View post</a></b></div>` : ""}
+      <div class="row"><span>Uploaded</span><b>${new Date(item.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</b></div>
+      <div class="row"><span>Duration</span><b id="dDur">${item.duration ? fmt(item.duration) : "—"}</b></div>
+      <div class="row"><span>File size</span><b id="dSize">${item.fileSize ? bytes(item.fileSize) : "—"}</b></div>
+    </section>
+
+    <div class="actions">
+      <button class="dlbtn" id="dlbtn">${I.dl}<span>Download</span></button>
+      <button class="sharebtn" id="shareBtn" aria-label="Share">${I.share}</button>
+    </div>
+    <div class="count"><b id="dcount">${item.downloads}</b> total downloads</div>`;
+
+  /* media element */
+  let m;
+  if (isAudio) {
+    m = new Audio(item.src); m.preload = "metadata";
+    const pbtn = $("#pbtn"), seek = $("#seek");
+     const spin = '<span class="spin"></span>';
+    pbtn.addEventListener("click", () => {
+      if (m.paused) {
+        pbtn.innerHTML = spin;
+        m.play().catch(() => { pbtn.innerHTML = I.play; toast("Could not play this file"); });
+      } else m.pause();
+    });
+    m.addEventListener("playing", () => { pbtn.innerHTML = I.pause; });
+    m.addEventListener("waiting", () => { if (!m.paused) pbtn.innerHTML = spin; });
+    m.addEventListener("pause", () => { pbtn.innerHTML = I.play; });
+    m.addEventListener("ended", () => { pbtn.innerHTML = I.play; });
+    m.addEventListener("error", () => { pbtn.innerHTML = I.play; });
+    m.addEventListener("timeupdate", () => { seek.value = m.currentTime; $("#cur").textContent = fmt(m.currentTime); });
+    seek.addEventListener("input", () => { m.currentTime = +seek.value; });
+    m.addEventListener("loadedmetadata", () => { seek.max = m.duration; $("#dur").textContent = fmt(m.duration); });
+  } else {
+    m = $("#vid");
+  }
+  m.addEventListener("loadedmetadata", () => { if (!item.duration) $("#dDur").textContent = fmt(m.duration); });
+
+  /* read the real download count back from the backend */
+  async function syncCount() {
+    try {
+      const res = await fetch(API + "/api/" + item.type + "/" + encodeURIComponent(item.id));
+      if (!res.ok) return;
+      const json = await res.json();
+      item.downloads = json.data.downloads; $("#dcount").textContent = item.downloads;
+    } catch {}
+  }
+
+  /* download with progress inside the button (backend streams the file and counts it) */
+  const dl = $("#dlbtn"); let busy = false;
+  const setBtn = (p, label) => { dl.style.setProperty("--p", p + "%"); dl.querySelector("span").textContent = label; };
+  const ufile = (item.title.replace(/[\\/:*?"<>|]+/g, "").trim() || "download") + (item.format && item.format !== "—" ? "." + item.format.toLowerCase() : "");
+  function finish(href, name) {
+    const a = document.createElement("a"); a.href = href; a.download = name || ufile;
+    document.body.appendChild(a); a.click(); a.remove();
+    busy = false; setBtn(0, "Download"); dl.innerHTML = I.dl + "<span>Download</span>";
+    setTimeout(syncCount, 800);
+  }
+  dl.addEventListener("click", async () => {
+    if (busy) return; busy = true; setBtn(0, "Downloading… 0%");
+    try {
+      const res = await fetch(dlUrl); if (!res.ok) throw new Error();
+      const total = +res.headers.get("content-length") || item.fileSize || 0;
+      const cd = res.headers.get("content-disposition") || "";
+      const mm = cd.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+      let name = ""; try { name = mm ? decodeURIComponent(mm[1]) : ""; } catch { name = mm ? mm[1] : ""; }
+      const reader = res.body.getReader(); const chunks = []; let got = 0, fake = 0;
+      while (true) {
+        const { done, value } = await reader.read(); if (done) break;
+        chunks.push(value); got += value.length; fake = Math.min(95, fake + 5);
+        const p = total ? Math.min(100, Math.round(got / total * 100)) : fake;
+        setBtn(p, "Downloading… " + p + "%");
+      }
+      setBtn(100, "Downloading… 100%");
+      setTimeout(() => finish(URL.createObjectURL(new Blob(chunks)), name), 250);
+    } catch {
+      // fallback: let the browser download straight from the backend (it still counts there)
+      setBtn(100, "Downloading… 100%");
+      setTimeout(() => finish(dlUrl), 250);
+    }
+  });
+
+  /* share */
+  const shareUrl = (() => {
+    const u = new URL(location.href);
+    u.search = "";
+    u.searchParams.set("type", item.type);
+    u.searchParams.set("id", item.shareId || item.id);
+    return u.toString();
+  })();
+  $("#shareBtn").addEventListener("click", async () => {
+    if (navigator.share) { try { await navigator.share({ title: item.title, url: shareUrl }); } catch {} }
+    else if (navigator.clipboard) { await navigator.clipboard.writeText(shareUrl); toast("Link copied"); }
+    else toast(shareUrl);
+  });
+}
+
+/* mobile equalizer background */
+(function () {
+  const eq = document.createElement("div");
+  eq.className = "eq"; eq.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 20; i++) {
+    const b = document.createElement("i");
+    b.style.animationDuration = (1.1 + Math.random() * 1.2).toFixed(2) + "s";
+    b.style.animationDelay = (-Math.random() * 2).toFixed(2) + "s";
+    eq.appendChild(b);
+  }
+  document.body.prepend(eq);
+})();
+
+</script>
+</body>
+</html>
