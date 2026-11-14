@@ -271,33 +271,67 @@ function toast(msg) {
   clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 3000);
 }
 
-/* ========= LOAD FROM BACKEND ========= */
+/* ========= LOAD FROM BACKEND (with cache) ========= */
+const CACHE_TTL = 60 * 1000;                 // within 60s a cached page is used as-is; after that it refreshes in the background
+const cache = new Map();                     // key -> { items, meta, time }
+const keyOf = (tab, sort, page, q) => [tab, sort, page, q.trim().toLowerCase()].join("|");
+
+async function fetchList(tab, sort, page, q) {
+  const params = new URLSearchParams({ sort, page, limit: PAGE_SIZE });
+  if (q.trim()) params.set("q", q.trim());
+  const res = await fetch(API + "/api/" + tab + "?" + params);
+  if (!res.ok) throw new Error();
+  const json = await res.json();
+  return {
+    items: (json.data || []).map(x => ({
+      id: x._id, shareId: x.shareId || "", type: tab, title: x.title || "", artist: x.artist || "",
+      src: abs(x.fileUrl), thumb: abs(x.thumbnailUrl),
+      duration: x.duration || 0, date: x.createdAt, downloads: x.downloads || 0
+    })),
+    meta: { page: json.page || 1, pages: json.pages || 1, total: json.total || 0, totalAll: json.totalAll || 0 }
+  };
+}
+
+/* quietly preload page 1 of a tab so switching to it is instant */
+function prefetch(tab) {
+  const key = keyOf(tab, state.sort, 1, "");
+  if (cache.has(key)) return;
+  fetchList(tab, state.sort, 1, "").then(d => cache.set(key, { ...d, time: Date.now() })).catch(() => {});
+}
+
 async function load() {
   const my = ++reqId;
   audio.pause(); currentId = null; loadingId = null;
-  loading = true; loadError = false;
-  render();
+  loadError = false;
+  const key = keyOf(state.tab, state.sort, state.page, state.q);
+  const hit = cache.get(key);
+
+  if (hit) {                                   // show cached data immediately
+    ITEMS = hit.items; meta = hit.meta; state.page = meta.page;
+    loading = false; render();
+    if (Date.now() - hit.time < CACHE_TTL) { prefetch(state.tab === "audio" ? "video" : "audio"); return; }
+  } else {                                     // nothing cached: show the loader
+    loading = true; render();
+  }
+
   try {
-    const params = new URLSearchParams({ sort: state.sort, page: state.page, limit: PAGE_SIZE });
-    if (state.q.trim()) params.set("q", state.q.trim());
-    const res = await fetch(API + "/api/" + state.tab + "?" + params);
-    if (!res.ok) throw new Error();
-    const json = await res.json();
-    if (my !== reqId) return;               // a newer request replaced this one
-    ITEMS = (json.data || []).map(x => ({
-          id: x._id, shareId: x.shareId || "", type: state.tab, title: x.title || "", artist: x.artist || "",
-      src: abs(x.fileUrl), thumb: abs(x.thumbnailUrl),
-      duration: x.duration || 0, date: x.createdAt, downloads: x.downloads || 0
-    }));
-    meta = { page: json.page || 1, pages: json.pages || 1, total: json.total || 0, totalAll: json.totalAll || 0 };
-    state.page = meta.page;
+    const data = await fetchList(state.tab, state.sort, state.page, state.q);
+    cache.set(key, { ...data, time: Date.now() });
+    if (my !== reqId) return;                  // a newer request replaced this one
+    if (hit) {                                 // background refresh: only redraw if something changed and nothing is busy
+      const same = JSON.stringify(hit.items) === JSON.stringify(data.items);
+      if (same || currentId || Object.keys(downloading).length) return;
+    }
+    ITEMS = data.items; meta = data.meta; state.page = meta.page;
   } catch {
     if (my !== reqId) return;
+    if (hit) return;                           // keep showing the cached data if the refresh fails
     ITEMS = []; loadError = true;
     meta = { page: 1, pages: 1, total: 0, totalAll: 0 };
   }
   loading = false;
   render();
+  prefetch(state.tab === "audio" ? "video" : "audio");
 }
 
 /* ========= RENDER ========= */
